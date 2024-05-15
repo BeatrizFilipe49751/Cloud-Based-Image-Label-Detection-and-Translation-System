@@ -9,7 +9,11 @@
         <module name="ContractSG" />
         <module name="ServerApp" />
         <module name="ContractSF" />
+        <module name="LabelsApp" />
         <module name="ClientApp" />
+        <module name="CloudFunction" />
+        <module name="GoogleCloudServices" />
+        <module name="LoggingApp" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -12,16 +12,4 @@ public interface ImageSubmissionRequestOrBuilder extends
    * @return The imageChunk.
    */
   com.google.protobuf.ByteString getImageChunk();
-
-  /**
-   * <code>string path = 2;</code>
-   * @return The path.
-   */
-  java.lang.String getPath();
-  /**
-   * <code>string path = 2;</code>
-   * @return The bytes for path.
-   */
-  com.google.protobuf.ByteString
-      getPathBytes();
 }

@@ -1,5 +1,7 @@
 package servicesf;
 
+import io.grpc.stub.StreamObserver;
+
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 
 /**
@@ -160,10 +162,13 @@ public final class ServiceSFGrpc {
      * <pre>
      * Submit an image
      * </pre>
+     *
+     * @return
      */
-    default void submitImage(servicesf.ImageSubmissionRequest request,
-        io.grpc.stub.StreamObserver<servicesf.ImageSubmissionResponse> responseObserver) {
+    default StreamObserver<ImageSubmissionRequest> submitImage(ImageSubmissionRequest request,
+                                                               StreamObserver<ImageSubmissionResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSubmitImageMethod(), responseObserver);
+      return null;
     }
 
     /**

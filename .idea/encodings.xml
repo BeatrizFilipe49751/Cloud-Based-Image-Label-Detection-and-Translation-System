@@ -3,12 +3,20 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/ClientApp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ClientApp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/CloudFunction/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/CloudFunction/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Contract/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Contract/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ContractSF/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ContractSF/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ContractSG/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ContractSG/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/GoogleCloudServices/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/GoogleCloudServices/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/LabelsApp/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/LabelsApp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/LoggingApp/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/LoggingApp/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ServerApp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ServerApp/src/main/resources" charset="UTF-8" />
   </component>

@@ -3,8 +3,6 @@ package serverapp;
 import io.grpc.ServerBuilder;
 import serviceimpl.servicesf.ServiceSF;
 import serviceimpl.servicesg.ServiceSG;
-import servicesf.ServiceSFGrpc;
-import servicesg.ServiceSGGrpc;
 import shutdownhook.ShutdownHook;
 
 public class ServerApp{

@@ -9,6 +9,10 @@
         <option value="$PROJECT_DIR$/ServerApp/pom.xml" />
         <option value="$PROJECT_DIR$/ContractSF/pom.xml" />
         <option value="$PROJECT_DIR$/ContractSG/pom.xml" />
+        <option value="$PROJECT_DIR$/CloudFunction/pom.xml" />
+        <option value="$PROJECT_DIR$/LabelsApp/pom.xml" />
+        <option value="$PROJECT_DIR$/LoggingApp/pom.xml" />
+        <option value="$PROJECT_DIR$/GoogleCloudServices/pom.xml" />
       </list>
     </option>
   </component>

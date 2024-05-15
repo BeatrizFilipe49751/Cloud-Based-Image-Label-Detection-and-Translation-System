@@ -18,7 +18,6 @@ service ServiceSF{
 
 message ImageSubmissionRequest{
   bytes image_chunk = 1;
-  string path = 2;
 }
 
 message ImageSubmissionResponse{

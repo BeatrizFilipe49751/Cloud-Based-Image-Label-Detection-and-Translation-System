@@ -54,23 +54,23 @@ public final class ServiceContractSF {
   static {
     java.lang.String[] descriptorData = {
       "\n\032sf/ServiceContractSF.proto\022\tsfservice\"" +
-      ";\n\026ImageSubmissionRequest\022\023\n\013image_chunk" +
-      "\030\001 \001(\014\022\014\n\004path\030\002 \001(\t\",\n\027ImageSubmissionR" +
-      "esponse\022\021\n\tunique_id\030\001 \001(\t\"(\n\023ImageDetai" +
-      "lsRequest\022\021\n\tunique_id\030\001 \001(\t\"]\n\024ImageDet" +
-      "ailsResponse\022\027\n\017characteristics\030\001 \003(\t\022\024\n" +
-      "\014translations\030\002 \003(\t\022\026\n\016processed_date\030\003 " +
-      "\001(\t\"S\n\023AllFilesWithRequest\022\022\n\nstart_date" +
-      "\030\001 \001(\t\022\020\n\010end_date\030\002 \001(\t\022\026\n\016characterist" +
-      "ic\030\003 \001(\t\"*\n\024AllFilesWithResponse\022\022\n\nfile" +
-      "_names\030\001 \003(\t2\205\002\n\tServiceSF\022T\n\013submitImag" +
-      "e\022!.sfservice.ImageSubmissionRequest\032\".s" +
-      "fservice.ImageSubmissionResponse\022R\n\017getI" +
-      "mageDetails\022\036.sfservice.ImageDetailsRequ" +
-      "est\032\037.sfservice.ImageDetailsResponse\022N\n\013" +
-      "getAllFiles\022\036.sfservice.AllFilesWithRequ" +
-      "est\032\037.sfservice.AllFilesWithResponseB\r\n\t" +
-      "servicesfP\001b\006proto3"
+      "-\n\026ImageSubmissionRequest\022\023\n\013image_chunk" +
+      "\030\001 \001(\014\",\n\027ImageSubmissionResponse\022\021\n\tuni" +
+      "que_id\030\001 \001(\t\"(\n\023ImageDetailsRequest\022\021\n\tu" +
+      "nique_id\030\001 \001(\t\"]\n\024ImageDetailsResponse\022\027" +
+      "\n\017characteristics\030\001 \003(\t\022\024\n\014translations\030" +
+      "\002 \003(\t\022\026\n\016processed_date\030\003 \001(\t\"S\n\023AllFile" +
+      "sWithRequest\022\022\n\nstart_date\030\001 \001(\t\022\020\n\010end_" +
+      "date\030\002 \001(\t\022\026\n\016characteristic\030\003 \001(\t\"*\n\024Al" +
+      "lFilesWithResponse\022\022\n\nfile_names\030\001 \003(\t2\205" +
+      "\002\n\tServiceSF\022T\n\013submitImage\022!.sfservice." +
+      "ImageSubmissionRequest\032\".sfservice.Image" +
+      "SubmissionResponse\022R\n\017getImageDetails\022\036." +
+      "sfservice.ImageDetailsRequest\032\037.sfservic" +
+      "e.ImageDetailsResponse\022N\n\013getAllFiles\022\036." +
+      "sfservice.AllFilesWithRequest\032\037.sfservic" +
+      "e.AllFilesWithResponseB\r\n\tservicesfP\001b\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -81,7 +81,7 @@ public final class ServiceContractSF {
     internal_static_sfservice_ImageSubmissionRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_sfservice_ImageSubmissionRequest_descriptor,
-        new java.lang.String[] { "ImageChunk", "Path", });
+        new java.lang.String[] { "ImageChunk", });
     internal_static_sfservice_ImageSubmissionResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_sfservice_ImageSubmissionResponse_fieldAccessorTable = new

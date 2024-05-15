@@ -17,7 +17,6 @@ private static final long serialVersionUID = 0L;
   }
   private ImageSubmissionRequest() {
     imageChunk_ = com.google.protobuf.ByteString.EMPTY;
-    path_ = "";
   }
 
   @java.lang.Override
@@ -56,44 +55,6 @@ private static final long serialVersionUID = 0L;
     return imageChunk_;
   }
 
-  public static final int PATH_FIELD_NUMBER = 2;
-  private volatile java.lang.Object path_;
-  /**
-   * <code>string path = 2;</code>
-   * @return The path.
-   */
-  @java.lang.Override
-  public java.lang.String getPath() {
-    java.lang.Object ref = path_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      path_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string path = 2;</code>
-   * @return The bytes for path.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getPathBytes() {
-    java.lang.Object ref = path_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      path_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -111,9 +72,6 @@ private static final long serialVersionUID = 0L;
     if (!imageChunk_.isEmpty()) {
       output.writeBytes(1, imageChunk_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(path_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, path_);
-    }
     getUnknownFields().writeTo(output);
   }
 
@@ -126,9 +84,6 @@ private static final long serialVersionUID = 0L;
     if (!imageChunk_.isEmpty()) {
       size += com.google.protobuf.CodedOutputStream
         .computeBytesSize(1, imageChunk_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(path_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, path_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -147,8 +102,6 @@ private static final long serialVersionUID = 0L;
 
     if (!getImageChunk()
         .equals(other.getImageChunk())) return false;
-    if (!getPath()
-        .equals(other.getPath())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -162,8 +115,6 @@ private static final long serialVersionUID = 0L;
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + IMAGE_CHUNK_FIELD_NUMBER;
     hash = (53 * hash) + getImageChunk().hashCode();
-    hash = (37 * hash) + PATH_FIELD_NUMBER;
-    hash = (53 * hash) + getPath().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -294,8 +245,6 @@ private static final long serialVersionUID = 0L;
       super.clear();
       imageChunk_ = com.google.protobuf.ByteString.EMPTY;
 
-      path_ = "";
-
       return this;
     }
 
@@ -323,7 +272,6 @@ private static final long serialVersionUID = 0L;
     public servicesf.ImageSubmissionRequest buildPartial() {
       servicesf.ImageSubmissionRequest result = new servicesf.ImageSubmissionRequest(this);
       result.imageChunk_ = imageChunk_;
-      result.path_ = path_;
       onBuilt();
       return result;
     }
@@ -375,10 +323,6 @@ private static final long serialVersionUID = 0L;
       if (other.getImageChunk() != com.google.protobuf.ByteString.EMPTY) {
         setImageChunk(other.getImageChunk());
       }
-      if (!other.getPath().isEmpty()) {
-        path_ = other.path_;
-        onChanged();
-      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -410,11 +354,6 @@ private static final long serialVersionUID = 0L;
 
               break;
             } // case 10
-            case 18: {
-              path_ = input.readStringRequireUtf8();
-
-              break;
-            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -461,82 +400,6 @@ private static final long serialVersionUID = 0L;
     public Builder clearImageChunk() {
       
       imageChunk_ = getDefaultInstance().getImageChunk();
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object path_ = "";
-    /**
-     * <code>string path = 2;</code>
-     * @return The path.
-     */
-    public java.lang.String getPath() {
-      java.lang.Object ref = path_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        path_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string path = 2;</code>
-     * @return The bytes for path.
-     */
-    public com.google.protobuf.ByteString
-        getPathBytes() {
-      java.lang.Object ref = path_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        path_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string path = 2;</code>
-     * @param value The path to set.
-     * @return This builder for chaining.
-     */
-    public Builder setPath(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      path_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string path = 2;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearPath() {
-      
-      path_ = getDefaultInstance().getPath();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string path = 2;</code>
-     * @param value The bytes for path to set.
-     * @return This builder for chaining.
-     */
-    public Builder setPathBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      path_ = value;
       onChanged();
       return this;
     }
