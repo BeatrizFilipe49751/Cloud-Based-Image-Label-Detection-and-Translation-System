@@ -5,18 +5,21 @@ import io.grpc.stub.StreamObserver;
 import servicesf.*;
 
 public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
-    public ServiceSF(int port) {}
+    public ServiceSF(int port) {
+    }
 
     private final CloudStorageService cs = new CloudStorageService();
 
     @Override
-    public StreamObserver<ImageSubmissionRequest> submitImage(ImageSubmissionRequest request, StreamObserver<ImageSubmissionResponse> responseObserver) {
-        return new StreamObserver<>() {
+    public StreamObserver<ImageSubmissionRequest> submitImage(StreamObserver<ImageSubmissionResponse> responseObserver) {
+        return new StreamObserver<ImageSubmissionRequest>() {
             private final StringBuilder imageData = new StringBuilder();
+            private final String uniqueId = cs.generateUniqueBlobName();
 
             @Override
             public void onNext(ImageSubmissionRequest imageSubmissionRequest) {
-                imageData.append(new String(request.getImageChunk().toByteArray()));
+                String requestId = cs.storeImage(imageData.toString(), uniqueId); //TODO: Implementar o método storeImage
+                imageData.append(new String(imageSubmissionRequest.getImageChunk().toByteArray()));
             }
 
             @Override
@@ -41,5 +44,6 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
     }
 
     @Override
-    public void getAllFiles(AllFilesWithRequest request, StreamObserver<AllFilesWithResponse> responseObserver) {}
+    public void getAllFiles(AllFilesWithRequest request, StreamObserver<AllFilesWithResponse> responseObserver) {
+    }
 }

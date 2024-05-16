@@ -7,7 +7,7 @@ package sfservice;
 
 service ServiceSF{
   // Submit an image
-  rpc submitImage(ImageSubmissionRequest) returns (ImageSubmissionResponse);
+  rpc submitImage(stream ImageSubmissionRequest) returns (ImageSubmissionResponse);
 
   // Get details and translations of image
   rpc getImageDetails(ImageDetailsRequest) returns (ImageDetailsResponse);

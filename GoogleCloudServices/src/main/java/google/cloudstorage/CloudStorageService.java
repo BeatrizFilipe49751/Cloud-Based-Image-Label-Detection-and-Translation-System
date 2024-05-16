@@ -22,7 +22,7 @@ public class CloudStorageService {
         return blob.getBucket() + "/" + blob.getName();
     }
 
-    private String generateUniqueBlobName() {
+    public String generateUniqueBlobName() {
         return bucketName + "-image-" + UUID.randomUUID();
     }
 
