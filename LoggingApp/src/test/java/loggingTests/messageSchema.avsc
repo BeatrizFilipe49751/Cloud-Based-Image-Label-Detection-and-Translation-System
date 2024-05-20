@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "Avro",
+  "fields": [
+    {
+      "name": "id",
+      "type": "int"
+    },
+    {
+      "name": "bucketName",
+      "type": "string"
+    },
+    {
+      "name": "blobName",
+      "type": "string"
+    }
+  ]
+}

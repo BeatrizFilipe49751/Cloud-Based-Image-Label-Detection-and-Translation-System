@@ -11,18 +11,19 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+
+// CRIAR UM SERVIÇO FIRESTORE DIFERENTE PARA AS IMAGENS E AS MENSAGENS
 public class FirestoreService {
 
-    private final Firestore db;
     private final CollectionReference logsCollection;
     private final CollectionReference characteristicsCollection;
 
-    public FirestoreService(String dbName) {
-        this.db = FirestoreOptions
-                .newBuilder().setDatabaseId(dbName).setCredentials(/*Faltam as credenciais*/)
+    public FirestoreService() {
+        Firestore db = FirestoreOptions
+                .newBuilder().setDatabaseId("db_name").setCredentials(/*Faltam as credenciais*/)
                 .build().getService();
         this.logsCollection = db.collection("Logs");
-        this.characteristicsCollection = db.collection("Images");
+        this.characteristicsCollection = db.collection("ImagesDetails");
     }
 
     public void saveLog(LogEntry logEntry) throws ExecutionException, InterruptedException {
@@ -52,8 +53,8 @@ public class FirestoreService {
         Timestamp start = Timestamp.of(formatter.parse(startDate));
         Timestamp end = Timestamp.of(formatter.parse(endDate));
         Query query = characteristicsCollection
-                .whereGreaterThan("event.dtInicio", start)
-                .whereLessThan("event.dtFinal", end)
+                .whereGreaterThan("timestamp", start)
+                .whereLessThan("timestamp", end)
                 .whereArrayContains("visionInformation.details", characteristic);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         for (DocumentSnapshot doc: querySnapshot.get().getDocuments()) {
