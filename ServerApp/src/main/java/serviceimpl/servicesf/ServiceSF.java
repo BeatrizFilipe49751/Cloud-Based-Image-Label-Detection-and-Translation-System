@@ -12,14 +12,13 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
     @Override
     public StreamObserver<ImageSubmissionRequest> submitImage(StreamObserver<ImageSubmissionResponse> responseObserver) {
-        return new StreamObserver<ImageSubmissionRequest>() {
-            private final StringBuilder imageData = new StringBuilder();
-            private final String uniqueId = cs.generateUniqueBlobName();
+        return new StreamObserver<>() {
+            private final String uniqueBlobId = cs.generateUniqueBlobName();
+            private String blobLink = "";
 
             @Override
             public void onNext(ImageSubmissionRequest imageSubmissionRequest) {
-                String requestId = cs.storeImage(imageData.toString(), uniqueId); //TODO: Implementar o método storeImage
-                imageData.append(new String(imageSubmissionRequest.getImageChunk().toByteArray()));
+                blobLink = cs.storeImageBytes(imageSubmissionRequest.getImageChunk().toByteArray(), uniqueBlobId);
             }
 
             @Override
@@ -30,9 +29,7 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
             @Override
             public void onCompleted() {
-                // Ao concluir o streaming, armazena a imagem no Cloud Storage e retorna o ID do pedido
-                String requestId = cs.storeImage(imageData.toString());
-                responseObserver.onNext(ImageSubmissionResponse.newBuilder().setUniqueId(requestId).build());
+                responseObserver.onNext(ImageSubmissionResponse.newBuilder().setUniqueId(blobLink).build());
                 responseObserver.onCompleted();
             }
         };

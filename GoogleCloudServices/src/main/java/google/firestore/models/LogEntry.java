@@ -5,9 +5,9 @@ import com.google.cloud.firestore.annotation.DocumentId;
 public class LogEntry {
     @DocumentId
     private String id;
-    private String requestId;
-    private String timestamp;
-    private String details;
+    private final String requestId;
+    private final String timestamp;
+    private final String details;
 
     public LogEntry(String requestId, String timestamp, String details) {
         this.requestId = requestId;
