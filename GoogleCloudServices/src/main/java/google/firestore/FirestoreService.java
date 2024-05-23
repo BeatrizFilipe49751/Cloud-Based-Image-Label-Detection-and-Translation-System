@@ -47,8 +47,8 @@ public class FirestoreService {
         }
     }
 
-    public List<ImageInformation> getImageInfoBetweenCertainDatesAndWith(String startDate, String endDate, String characteristic) throws ParseException, ExecutionException, InterruptedException {
-        List<ImageInformation> images = new java.util.ArrayList<>(List.of());
+    public List<String> getImageFileNameBetweenCertainDatesAndWith(String startDate, String endDate, String characteristic) throws ParseException, ExecutionException, InterruptedException {
+        List<String> images = new java.util.ArrayList<>(List.of());
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Timestamp start = Timestamp.of(formatter.parse(startDate));
         Timestamp end = Timestamp.of(formatter.parse(endDate));
@@ -58,7 +58,7 @@ public class FirestoreService {
                 .whereArrayContains("visionInformation.details", characteristic);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         for (DocumentSnapshot doc: querySnapshot.get().getDocuments()) {
-            images.add(doc.toObject(ImageInformation.class));
+            images.add(doc.getId());
         }
         return images;
     }

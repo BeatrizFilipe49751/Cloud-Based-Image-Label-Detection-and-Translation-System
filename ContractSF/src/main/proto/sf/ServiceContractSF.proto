@@ -10,10 +10,10 @@ service ServiceSF{
   rpc submitImage(stream ImageSubmissionRequest) returns (ImageSubmissionResponse);
 
   // Get details and translations of image
-  rpc getImageDetails(ImageDetailsRequest) returns (ImageDetailsResponse);
+  rpc getImageDetails(ImageDetailsRequest) returns (stream ImageDetailsResponse);
 
   // Get all files with certain dates and characteristic
-  rpc getAllFiles(AllFilesWithRequest) returns (AllFilesWithResponse);
+  rpc getAllFiles(AllFilesWithRequest) returns (stream AllFilesWithResponse);
 }
 
 message ImageSubmissionRequest{

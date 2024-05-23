@@ -2,11 +2,9 @@ package google.firestore.models;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 
-public class ImageInformation {
+public record ImageInformation(String requestId, String timestamp, TranslationInformation translationInfo, VisionInformation visionInfo) {
     @DocumentId
-    private String id;
+    private static String id;
 
-    public ImageInformation(String requestId, String timestamp, TranslationInformation translationInfo, VisionInformation visionInfo) {
-    }
 }
 
