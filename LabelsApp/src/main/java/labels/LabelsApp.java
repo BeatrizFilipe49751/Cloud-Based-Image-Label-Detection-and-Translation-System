@@ -1,5 +1,6 @@
 package labels;
 
+import com.google.cloud.Timestamp;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
@@ -47,11 +48,14 @@ public class LabelsApp {
                 String blobName = record.get("blobName").toString();
                 Map<String, String> attributes = message.getAttributesMap();
                 String timestamp = attributes.get("timestamp");
+
+                Timestamp firestoreTimestamp = Timestamp.parseTimestamp(timestamp);
+
                 List<String> labels = detectLabels(bucketName, blobName);
                 List<String> labelsTranslated = TranslateLabels(labels);
                 TranslationInformation translationInformation = new TranslationInformation(labelsTranslated);
                 VisionInformation visionInformation = new VisionInformation(labels);
-                ImageInformation imageInformation = new ImageInformation(id, timestamp, translationInformation, visionInformation);
+                ImageInformation imageInformation = new ImageInformation(id, firestoreTimestamp, translationInformation, visionInformation);
                 firestoreService.saveImageInfo(imageInformation);
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {

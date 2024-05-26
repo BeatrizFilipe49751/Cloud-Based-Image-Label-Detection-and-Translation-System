@@ -12,6 +12,7 @@ import google.firestore.models.VisionInformation;
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -65,29 +66,34 @@ public class FirestoreService {
 
     public List<String> getImageFileNameBetweenCertainDatesAndWith(String startDate, String endDate, String characteristic) throws ParseException, ExecutionException, InterruptedException {
         List<String> images = new java.util.ArrayList<>(List.of());
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Timestamp start = Timestamp.of(formatter.parse(startDate));
-        Timestamp end = Timestamp.of(formatter.parse(endDate));
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
+        Date startParsed = formatter.parse(startDate);
+        Date endParsed = formatter.parse(endDate);
+
+        Timestamp start = Timestamp.of(startParsed);
+        Timestamp end = Timestamp.of(endParsed);
+
         Query query = characteristicsCollection
                 .whereGreaterThan("timestamp", start)
                 .whereLessThan("timestamp", end)
-                .whereArrayContains("visionInformation.details", characteristic);
+                .whereArrayContains("visionInfo", characteristic);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         for (DocumentSnapshot doc: querySnapshot.get().getDocuments()) {
-            images.add(doc.getId());
+            images.add(doc.getString("requestId"));
         }
         return images;
     }
 
     private static ImageInformation fromDocumentSnapshot(DocumentSnapshot document) {
         if (document != null && document.exists()) {
-            String requestId = document.getString("requestId");
-            String timestamp = document.getString("timestamp");
-            List<String> translationInfoList = (List<String>) document.get("translationInfo");
-            TranslationInformation translationInfo = new TranslationInformation(translationInfoList);
-            List<String> visionInfoList = (List<String>) document.get("visionInfo");
-            VisionInformation visionInfo = new VisionInformation(visionInfoList);
-            return new ImageInformation(requestId, timestamp, translationInfo, visionInfo);
+                String requestId = document.getString("requestId");
+                Timestamp timestamp = document.getTimestamp("timestamp");
+                List<String> translationInfoList = (List<String>) document.get("translationInfo");
+                TranslationInformation translationInfo = new TranslationInformation(translationInfoList);
+                List<String> visionInfoList = (List<String>) document.get("visionInfo");
+                VisionInformation visionInfo = new VisionInformation(visionInfoList);
+                return new ImageInformation(requestId, timestamp, translationInfo, visionInfo);
         } else {
             return null;
         }

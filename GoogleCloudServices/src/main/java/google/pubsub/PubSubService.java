@@ -10,6 +10,7 @@ import com.google.api.core.ApiService.State;
 import com.google.api.gax.core.ExecutorProvider;
 import com.google.api.gax.core.InstantiatingExecutorProvider;
 import com.google.api.gax.rpc.ApiException;
+import com.google.cloud.Timestamp;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.pubsub.v1.Subscriber;
@@ -19,16 +20,8 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
 import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.Encoder;
-import org.apache.avro.io.EncoderFactory;
-import org.apache.avro.specific.SpecificDatumWriter;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -67,10 +60,12 @@ public class PubSubService {
 
             ByteString data = ByteString.copyFromUtf8(record.toString());
 
+            Timestamp timestamp = Timestamp.now();
+
             // Create Pub/Sub message
             PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
                     .setData(data)
-                    .putAttributes("timestamp", String.valueOf(System.currentTimeMillis()))
+                    .putAttributes("timestamp", timestamp.toString())
                     .build();
 
             // Publish message

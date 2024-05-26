@@ -1,17 +1,19 @@
 package google.firestore.models;
 
+import com.google.cloud.Timestamp;
+
 import java.util.List;
 
 public class ImageInformation {
     private String requestId;
     private TranslationInformation translationInfo;
     private VisionInformation visionInfo;
-    private String timestamp;
+    private Timestamp timestamp;
 
     public ImageInformation() {
     }
 
-    public ImageInformation(String requestId, String timestamp, TranslationInformation translationInfo, VisionInformation visionInfo) {
+    public ImageInformation(String requestId, Timestamp timestamp, TranslationInformation translationInfo, VisionInformation visionInfo) {
         this.requestId = requestId;
         this.timestamp = timestamp;
         this.translationInfo = translationInfo;
@@ -22,7 +24,7 @@ public class ImageInformation {
         return requestId;
     }
 
-    public String getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 

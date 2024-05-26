@@ -1,5 +1,6 @@
 package serviceimpl.servicesf;
 
+import com.google.cloud.Timestamp;
 import google.cloudstorage.CloudStorageService;
 import google.firestore.FirestoreService;
 import google.firestore.models.ImageInformation;
@@ -12,6 +13,9 @@ import servicesf.*;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
@@ -75,9 +79,14 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
             // Add translations
             responseBuilder.addAllTranslations(imageInfo.getTranslationInfo());
 
+            Timestamp timestamp = imageInfo.getTimestamp();
+
             // Add processed date (if available)
-            if (imageInfo.getTimestamp() != null) {
-                responseBuilder.setProcessedDate(imageInfo.getTimestamp());
+            if (timestamp != null) {
+                Date date = timestamp.toDate();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                String formattedDate = sdf.format(date);
+                responseBuilder.setProcessedDate(formattedDate);
             }
 
             // Build the response
@@ -95,17 +104,21 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
     @Override
     public void getAllFiles(AllFilesWithRequest request, StreamObserver<AllFilesWithResponse> responseObserver) {
-        // TODO: Implement getAllFiles
-        int count = 0;
         try {
-            for (String imageInfo : fs.getImageFileNameBetweenCertainDatesAndWith(request.getStartDate(), request.getEndDate(), request.getCharacteristic())){
-                responseObserver.onNext(AllFilesWithResponse.newBuilder()
-                        .setFileNames(count, imageInfo)
-                        .build());
-                count++;
-            }
+            List<String> files = fs.getImageFileNameBetweenCertainDatesAndWith(
+                    request.getStartDate(),
+                    request.getEndDate(),
+                    request.getCharacteristic()
+            );
+
+            AllFilesWithResponse response = AllFilesWithResponse.newBuilder()
+                    .addAllFileNames(files)
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
         } catch (ExecutionException | InterruptedException | ParseException e) {
-            System.out.println("Error getting all files: " + e.getMessage());
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 }

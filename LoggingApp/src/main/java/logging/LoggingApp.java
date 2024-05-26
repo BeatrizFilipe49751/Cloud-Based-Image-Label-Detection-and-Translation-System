@@ -1,5 +1,6 @@
 package logging;
 
+import com.google.cloud.Timestamp;
 import com.google.protobuf.ByteString;
 import google.firestore.FirestoreService;
 import google.firestore.models.LogEntry;
@@ -38,7 +39,9 @@ public class LoggingApp {
                 Map<String, String> attributes = message.getAttributesMap();
                 String timestamp = attributes.get("timestamp");
 
-                firestoreService.saveLog(new LogEntry(record.get("id").toString(), timestamp));
+                Timestamp firestoreTimestamp = Timestamp.parseTimestamp(timestamp);
+
+                firestoreService.saveLog(new LogEntry(record.get("id").toString(), firestoreTimestamp));
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();

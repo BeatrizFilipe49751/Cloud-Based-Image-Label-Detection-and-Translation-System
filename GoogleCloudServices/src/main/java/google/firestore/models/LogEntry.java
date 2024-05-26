@@ -1,12 +1,14 @@
 package google.firestore.models;
 
+import com.google.cloud.Timestamp;
+
 public class LogEntry {
     private String requestId;
-    private String timestamp;
+    private Timestamp timestamp;
 
     public LogEntry() {}
 
-    public LogEntry(String requestId, String timestamp) {
+    public LogEntry(String requestId, Timestamp timestamp) {
         this.requestId = requestId;
         this.timestamp = timestamp;
     }
@@ -20,11 +22,11 @@ public class LogEntry {
         this.requestId = requestId;
     }
 
-    public String getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }

@@ -16,6 +16,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -159,7 +160,7 @@ public class ClientApp {
                                 break;
                             case 2:
                                 // Obtain names of files in the system between two dates
-                                // Implement the logic here
+                                getNamesBetweenDates(scan);
                                 break;
                             case 3:
                                 end = true;
@@ -251,4 +252,33 @@ public class ClientApp {
         };
     }
 
+    static private void getNamesBetweenDates(Scanner scan) {
+        blockingStubSF = ServiceSFGrpc.newBlockingStub(channel);
+
+        System.out.print("Enter the start date (dd-MM-yyyy): ");
+        String startDate = scan.next();
+        System.out.print("Enter the end date (dd-MM-yyyy): ");
+        String endDate = scan.next();
+        System.out.print("Enter the characteristic: ");
+        String characteristic = scan.next();
+
+        AllFilesWithRequest allFilesWithRequest = AllFilesWithRequest.newBuilder()
+                .setStartDate(startDate)
+                .setEndDate(endDate)
+                .setCharacteristic(characteristic)
+                .build();
+
+        try {
+            Iterator<AllFilesWithResponse> responseIterator = blockingStubSF.getAllFiles(allFilesWithRequest);
+
+            // Process each response in the stream
+            while (responseIterator.hasNext()) {
+                AllFilesWithResponse res = responseIterator.next();
+                // Print or process the file names from the response
+                System.out.println("Received file names: " + res.getFileNamesList());
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching file names: " + e.getMessage());
+        }
+    }
 }
