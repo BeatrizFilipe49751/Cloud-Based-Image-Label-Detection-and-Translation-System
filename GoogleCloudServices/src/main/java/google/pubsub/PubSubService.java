@@ -19,10 +19,12 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
 import org.apache.avro.Schema;
+import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
 
@@ -39,12 +41,18 @@ public class PubSubService {
     private final String loggingAppSubscriptionID = "LoggingAppSub";
     private final String labelsAppSubscriptionID = "LabelsAppSub";
     private final ExecutorProvider executorProvider = InstantiatingExecutorProvider.newBuilder().setExecutorThreadCount(4).build();
-    private final Schema schema = new Schema.Parser().parse(getClass().getResourceAsStream("/messageSchema.avsc"));
+    private Schema schema;
 
-    public PubSubService() throws IOException {
+    public PubSubService() {
+        try {
+            // Create Avro schema
+            this.schema = new Schema.Parser().parse(getClass().getResourceAsStream("/google/pubsub/messageSchema.avsc"));
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error reading Avro schema: " + e.getMessage());
+        }
     }
 
-    public void publishMessage(int id, String bucketName, String blobName) throws IOException, InterruptedException {
+    public void publishMessage(String id, String bucketName, String blobName) throws IOException, InterruptedException {
         ProjectTopicName topicName = ProjectTopicName.of(projectId, topicId);
         Publisher publisher = null;
 
@@ -57,19 +65,11 @@ public class PubSubService {
             record.put("bucketName", bucketName);
             record.put("blobName", blobName);
 
-            // Serialize Avro record to byte array
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
-            DatumWriter<GenericRecord> datumWriter = new SpecificDatumWriter<>(schema);
-            datumWriter.write(record, encoder);
-            encoder.flush();
-            outputStream.close();
-
-            byte[] avroData = outputStream.toByteArray();
+            ByteString data = ByteString.copyFromUtf8(record.toString());
 
             // Create Pub/Sub message
             PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
-                    .setData(ByteString.copyFrom(avroData))
+                    .setData(data)
                     .putAttributes("timestamp", String.valueOf(System.currentTimeMillis()))
                     .build();
 
@@ -100,7 +100,6 @@ public class PubSubService {
     public void subscribeMessageLogging(MessageReceiver receiver) {
         ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, loggingAppSubscriptionID);
         subscribeMessage(subscriptionName, receiver);
-
     }
 
     public void subscribeMessageLabels(MessageReceiver receiver) {

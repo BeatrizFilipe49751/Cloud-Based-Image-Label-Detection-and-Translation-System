@@ -4,40 +4,79 @@ import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.cloud.vision.v1.*;
-import google.firestore.FirestoreService;
+import com.google.protobuf.ByteString;
+import google.firestore.*;
+import google.firestore.models.ImageInformation;
+import google.firestore.models.TranslationInformation;
+import google.firestore.models.VisionInformation;
 import google.pubsub.PubSubService;
 import org.apache.avro.Schema;
-
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class LabelsApp {
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
 
-    public LabelsApp() throws IOException {
-        this.firestoreService = new FirestoreService();
-        this.pubSubService = new PubSubService();
-        this.schema = new Schema.Parser().parse(getClass().getResourceAsStream("/avro_schema.avsc"));
+    public LabelsApp() {
+        try {
+            this.firestoreService = new FirestoreService();
+            this.pubSubService = new PubSubService();
+            this.schema = new Schema.Parser().parse(getClass().getResourceAsStream("/labels/messageSchema.avsc"));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read schema file.");
+        }
     }
 
-    public List<String> detectLabels() throws IOException {
+    public void checkSub() {
+        pubSubService.subscribeMessageLabels((message, consumer) -> {
+            ByteString data = message.getData();
+            try {
+                GenericRecord record = deserializeAvroSchema(data);
+                String id = record.get("id").toString();
+                String bucketName = record.get("bucketName").toString();
+                String blobName = record.get("blobName").toString();
+                Map<String, String> attributes = message.getAttributesMap();
+                String timestamp = attributes.get("timestamp");
+                List<String> labels = detectLabels(bucketName, blobName);
+                List<String> labelsTranslated = TranslateLabels(labels);
+                TranslationInformation translationInformation = new TranslationInformation(labelsTranslated);
+                VisionInformation visionInformation = new VisionInformation(labels);
+                ImageInformation imageInformation = new ImageInformation(id, timestamp, translationInformation, visionInformation);
+                firestoreService.saveImageInfo(imageInformation);
+                consumer.ack();
+            } catch (IOException | ExecutionException | InterruptedException e) {
+                consumer.nack();
+                System.out.println("Error: " + e.getMessage());
+            }
+        });
+    }
+
+    public List<String> detectLabels(String bucketName, String blobName) throws IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
         List<String> labels = new ArrayList<>();
 
-        // Obtém imagem diretamente de um ficheiro: para testes locais
-        // ByteString imgBytes = ByteString.readFrom(new FileInputStream("cat.jpg"));
-        //Image img = Image.newBuilder().setContent(imgBytes).build();
-        // Obtém imagem diretamente do serviço Storage usando um gs URI (gs://...) para o Blob com imagem
+        String gsURI = String.format("gs://%s/%s", bucketName, blobName);
+
         Image img = Image.newBuilder()
                 .setSource(ImageSource.newBuilder().setImageUri(gsURI).build())
                 .build();
+
         Feature feat = Feature.newBuilder().setType(Feature.Type.LABEL_DETECTION).build();
+
         AnnotateImageRequest request =
                 AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
         requests.add(request);
+
         // Initialize client that will be used to send requests. This client only needs to be created
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
@@ -48,11 +87,8 @@ public class LabelsApp {
                 if (res.hasError()) {
                     System.out.format("Error: %s%n", res.getError().getMessage());
                 } else {
-                    // For full list of available annotations, see http://g.co/cloud/vision/docs
                     for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
                         labels.add(annotation.getDescription());
-//                        annotation.getAllFields()
-//                                .forEach((k, v) -> System.out.format("%s : %s%n", k, v.toString()));
                     }
                 }
             }
@@ -77,5 +113,12 @@ public class LabelsApp {
         } finally {
             return labelsTranslated;
         }
+    }
+
+    private GenericRecord deserializeAvroSchema(ByteString data) throws IOException {
+        String dataString = data.toStringUtf8();
+        DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
+        Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataString);
+        return reader.read(null, decoder);
     }
 }

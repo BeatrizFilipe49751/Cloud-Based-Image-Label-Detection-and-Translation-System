@@ -2,14 +2,14 @@ package google.cloudstorage;
 
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class CloudStorageService {
     private final Storage storage;
-    private final String bucketName = "bucketName";
+    private final String bucketName = "cn-tp-g09-bucket";
+
 
     public CloudStorageService() {
         storage = StorageOptions.getDefaultInstance().getService();
