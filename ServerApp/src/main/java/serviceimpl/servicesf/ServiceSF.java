@@ -29,7 +29,7 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
     private final PubSubService pubSubService = new PubSubService();
 
-    private final LoggingApp loggingApp = new LoggingApp("CN2324-T1-G09", "LoggingAppSub");
+    private final LoggingApp loggingApp = new LoggingApp();
 
     private final LabelsApp labelsApp = new LabelsApp();
 

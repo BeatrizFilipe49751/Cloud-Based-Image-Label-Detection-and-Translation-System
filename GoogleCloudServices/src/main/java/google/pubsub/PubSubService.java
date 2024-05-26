@@ -14,15 +14,15 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.pubsub.v1.Subscriber;
+import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
-import com.google.pubsub.v1.ProjectSubscriptionName;
-import com.google.pubsub.v1.ProjectTopicName;
-import com.google.pubsub.v1.PubsubMessage;
+import com.google.pubsub.v1.*;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -122,6 +122,34 @@ public class PubSubService {
                 subscriber.stopAsync();
             }
             logger.log(Level.SEVERE, "Error during subscriber setup: " + e.getMessage(), e);
+        }
+    }
+
+    public void pullMessagesWorkQueue(String subscriptionId, java.util.function.Consumer<PubsubMessage> messageConsumer) throws IOException {
+        ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
+
+        try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
+            while (true) {
+                PullRequest pullRequest = PullRequest.newBuilder()
+                        .setMaxMessages(10)
+                        .setSubscription(subscriptionName.toString())
+                        .build();
+
+                PullResponse pullResponse = subscriptionAdminClient.pullCallable().call(pullRequest);
+
+                List<ReceivedMessage> receivedMessages = pullResponse.getReceivedMessagesList();
+
+                for (ReceivedMessage receivedMessage : receivedMessages) {
+                    messageConsumer.accept(receivedMessage.getMessage());
+
+                    // Acknowledge the received message
+                    AcknowledgeRequest ackRequest = AcknowledgeRequest.newBuilder()
+                            .setSubscription(subscriptionName.toString())
+                            .addAckIds(receivedMessage.getAckId())
+                            .build();
+                    subscriptionAdminClient.acknowledgeCallable().call(ackRequest);
+                }
+            }
         }
     }
 }

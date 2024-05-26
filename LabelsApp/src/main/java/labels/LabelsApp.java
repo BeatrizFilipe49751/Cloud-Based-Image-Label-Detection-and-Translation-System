@@ -6,7 +6,7 @@ import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import google.firestore.*;
+import google.firestore.FirestoreService;
 import google.firestore.models.ImageInformation;
 import google.firestore.models.TranslationInformation;
 import google.firestore.models.VisionInformation;
@@ -17,13 +17,18 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LabelsApp {
+    private static final Logger logger = Logger.getLogger(LabelsApp.class.getName());
+
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
@@ -60,7 +65,7 @@ public class LabelsApp {
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();
-                System.out.println("Error: " + e.getMessage());
+                logger.log(Level.WARNING, e.getMessage());
             }
         });
     }
@@ -112,11 +117,10 @@ public class LabelsApp {
                         Translate.TranslateOption.targetLanguage("pt"));
                 labelsTranslated.add(translation.getTranslatedText());
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            return labelsTranslated;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, e.getMessage());
         }
+        return labelsTranslated;
     }
 
     private GenericRecord deserializeAvroSchema(ByteString data) throws IOException {

@@ -11,16 +11,20 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LoggingApp {
+    private static final Logger logger = Logger.getLogger(LoggingApp.class.getName());
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
 
-    public LoggingApp(String projectId, String subscriptionId) {
+    public LoggingApp() {
         try {
             this.firestoreService = new FirestoreService();
             this.pubSubService = new PubSubService();
@@ -45,7 +49,7 @@ public class LoggingApp {
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();
-                System.out.println("Error: " + e.getMessage());
+                logger.log(Level.WARNING, e.getMessage());
             }
         });
     }
