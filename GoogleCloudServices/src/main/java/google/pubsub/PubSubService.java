@@ -124,33 +124,5 @@ public class PubSubService {
             logger.log(Level.SEVERE, "Error during subscriber setup: " + e.getMessage(), e);
         }
     }
-
-    public void pullMessagesWorkQueue(String subscriptionId, java.util.function.Consumer<PubsubMessage> messageConsumer) throws IOException {
-        ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
-
-        try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
-            while (true) {
-                PullRequest pullRequest = PullRequest.newBuilder()
-                        .setMaxMessages(10)
-                        .setSubscription(subscriptionName.toString())
-                        .build();
-
-                PullResponse pullResponse = subscriptionAdminClient.pullCallable().call(pullRequest);
-
-                List<ReceivedMessage> receivedMessages = pullResponse.getReceivedMessagesList();
-
-                for (ReceivedMessage receivedMessage : receivedMessages) {
-                    messageConsumer.accept(receivedMessage.getMessage());
-
-                    // Acknowledge the received message
-                    AcknowledgeRequest ackRequest = AcknowledgeRequest.newBuilder()
-                            .setSubscription(subscriptionName.toString())
-                            .addAckIds(receivedMessage.getAckId())
-                            .build();
-                    subscriptionAdminClient.acknowledgeCallable().call(ackRequest);
-                }
-            }
-        }
-    }
 }
 
