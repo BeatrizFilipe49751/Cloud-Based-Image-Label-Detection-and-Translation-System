@@ -24,12 +24,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import servicesf.*;
 import servicesg.*;
 
 public class ClientApp {
 
+    private final static Logger logger = Logger.getLogger(ClientApp.class.getName());
     static String cfURL="https://us-central1-cn2324-t1-g09.cloudfunctions.net/lookupFunction?zone=us-central1-c&prjid=cn2324-t1-g09&group=grpc-servers";
     private static int svcPort = 8000;
     private static ManagedChannel channel;
@@ -200,8 +203,7 @@ public class ClientApp {
                         end = true;
                 }
             } catch (Exception ex) {
-                System.out.println("Error executing operations!");
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, "Error starting client app with exception: " + ex.getMessage());
             }
         }
     }

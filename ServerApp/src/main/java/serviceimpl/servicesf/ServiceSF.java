@@ -17,23 +17,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
     public ServiceSF(int port) {
+        LoggingApp loggingApp = new LoggingApp();
         loggingApp.checkSub();
+        LabelsApp labelsApp = new LabelsApp();
         labelsApp.checkSub();
     }
+
+    private final Logger logger = Logger.getLogger(ServiceSF.class.getName());
 
     private final CloudStorageService cs = new CloudStorageService();
     private final FirestoreService fs = new FirestoreService();
 
     private final PubSubService pubSubService = new PubSubService();
-
-    private final LoggingApp loggingApp = new LoggingApp();
-
-    private final LabelsApp labelsApp = new LabelsApp();
-
-
 
     @Override
     public StreamObserver<ImageSubmissionRequest> submitImage(StreamObserver<ImageSubmissionResponse> responseObserver) {
@@ -48,8 +48,8 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
             @Override
             public void onError(Throwable t) {
-                // FALTA TRATAR ERROS
-                t.printStackTrace();
+                logger.log(Level.WARNING, t.getMessage());
+                responseObserver.onError(Status.INTERNAL.withDescription(t.getMessage()).asRuntimeException());
             }
 
             @Override
@@ -57,7 +57,8 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
                 try {
                     pubSubService.publishMessage(blobLink, "cn-tp-g09-bucket", uniqueBlobId);
                 } catch (IOException | InterruptedException e) {
-                    System.out.println("Error publishing message to Pub/Sub: " + e.getMessage());
+                    logger.log(Level.WARNING, e.getMessage());
+                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
                 }
                 responseObserver.onNext(ImageSubmissionResponse.newBuilder().setUniqueId(blobLink).build());
                 responseObserver.onCompleted();

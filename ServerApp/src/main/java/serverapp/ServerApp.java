@@ -5,7 +5,11 @@ import serviceimpl.servicesf.ServiceSF;
 import serviceimpl.servicesg.ServiceSG;
 import shutdownhook.ShutdownHook;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ServerApp{
+    private static final Logger logger = Logger.getLogger(ServerApp.class.getName());
     private static int svcPort = 8000;
 
     public static void main(String[] args) {
@@ -18,14 +22,14 @@ public class ServerApp{
                     .addService(new ServiceSG(svcPort))
                     .build();
             svc.start();
-            System.out.println("Server started on port " + svcPort);
+            logger.log(Level.INFO, "Server started on port " + svcPort);
             // Java virtual machine shutdown hook
             // to capture normal or abnormal exits
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(svc));
             // Waits for the server to become terminated
             svc.awaitTermination();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, "Error starting server with exception: ", ex);
         }
     }
 }

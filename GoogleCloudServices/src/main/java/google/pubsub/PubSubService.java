@@ -14,15 +14,16 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.pubsub.v1.Subscriber;
-import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
-import com.google.pubsub.v1.*;
+import com.google.pubsub.v1.ProjectSubscriptionName;
+import com.google.pubsub.v1.ProjectTopicName;
+import com.google.pubsub.v1.PubsubMessage;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,9 +74,10 @@ public class PubSubService {
             ApiFutures.addCallback(messageIdFuture, new ApiFutureCallback<String>() {
                 @Override
                 public void onFailure(Throwable t) {
-                    if (t instanceof ApiException apiException) {
-                        logger.log(Level.SEVERE, "Error publishing message: " + apiException.getStatusCode().getCode());
-                        logger.log(Level.SEVERE, apiException.getMessage());
+                    if (t instanceof ApiException) {
+                        ApiException apiException = (ApiException) t;
+                        logger.log(Level.WARNING, "Error publishing message: " + apiException.getStatusCode().getCode());
+                        logger.log(Level.WARNING, apiException.getMessage());
                     }
                 }
 
@@ -83,7 +85,7 @@ public class PubSubService {
                 public void onSuccess(String messageId) {
                     logger.log(Level.INFO, "Published message ID: " + messageId);
                 }
-            });
+            }, executorProvider.getExecutor());
         } finally {
             if (publisher != null) {
                 publisher.shutdown();
@@ -112,7 +114,7 @@ public class PubSubService {
             subscriber.addListener(new Listener() {
                 @Override
                 public void failed(State from, Throwable failure) {
-                    logger.log(Level.SEVERE, "Error with subscriber: " + failure.getMessage());
+                    logger.log(Level.WARNING, "Error with subscriber: " + failure.getMessage());
                 }
             }, MoreExecutors.directExecutor());
             subscriber.startAsync().awaitRunning();
@@ -121,7 +123,7 @@ public class PubSubService {
             if (subscriber != null) {
                 subscriber.stopAsync();
             }
-            logger.log(Level.SEVERE, "Error during subscriber setup: " + e.getMessage(), e);
+            logger.log(Level.WARNING, "Error during subscriber setup: " + e.getMessage(), e);
         }
     }
 }
