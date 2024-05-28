@@ -28,7 +28,21 @@ public class ServiceSG extends ServiceSGGrpc.ServiceSGImplBase {
     }
 
     @Override
-    public void scaleImageProcessorsInstances(ScaleImageProcessorRequest request, StreamObserver<ScaleImageProcessorResponse> responseObserver) {}
+    public void scaleImageProcessorsInstances(ScaleImageProcessorRequest request, StreamObserver<ScaleImageProcessorResponse> responseObserver) {
+        int numInstances = request.getNumInstances();
+
+        boolean success = si.scaleImageProcessingInstancesLogic(numInstances);
+
+        String message = success ? "Successfully scaled image processing instances to " + numInstances
+                : "Failed to scale image procesing instances to " + numInstances;
+
+        ScaleImageProcessorResponse response = ScaleImageProcessorResponse.newBuilder()
+                .setMessage(message)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 
 
 }

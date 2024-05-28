@@ -181,16 +181,23 @@ public class ClientApp {
                                 int numServerInstances = scan.nextInt();
 
                                 // Send the scale request to the server
-                                ScaleServerInstancesRequest serverRequest = ScaleServerInstancesRequest.newBuilder()
+                                ScaleServerInstancesRequest serverGrpcInstancesRequest = ScaleServerInstancesRequest.newBuilder()
                                         .setNumInstances(numServerInstances)
                                         .build();
-                                ScaleServerInstancesResponse serverResponse = blockingStubSG.scaleServerInstances(serverRequest);
-                                System.out.println(serverResponse.getMessage());
+                                ScaleServerInstancesResponse serverGrpcInstancesResponse = blockingStubSG.scaleServerInstances(serverGrpcInstancesRequest);
+                                System.out.println(serverGrpcInstancesResponse.getMessage());
 
                                 break;
                             case 1:
-                                // Add or remove application server instances
-                                // Implement the logic here
+                                System.out.print("Enter the number of Image Processing server instances to scale to: ");
+                                int nummageProcessingInstances = scan.nextInt();
+
+                                // Send the scale request to the server
+                                ScaleImageProcessorRequest serverImageProcessingRequest = ScaleImageProcessorRequest.newBuilder()
+                                        .setNumInstances(nummageProcessingInstances)
+                                        .build();
+                                ScaleImageProcessorResponse serverImageProcessingResponse = blockingStubSG.scaleImageProcessorsInstances(serverImageProcessingRequest);
+                                System.out.println(serverImageProcessingResponse.getMessage());
                                 break;
                             case 3:
                                 end = true;
