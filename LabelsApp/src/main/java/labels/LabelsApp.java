@@ -6,7 +6,7 @@ import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import google.firestore.FirestoreService;
+import google.firestore.*;
 import google.firestore.models.ImageInformation;
 import google.firestore.models.TranslationInformation;
 import google.firestore.models.VisionInformation;
@@ -17,18 +17,13 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class LabelsApp {
-    private static final Logger logger = Logger.getLogger(LabelsApp.class.getName());
-
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
@@ -65,7 +60,7 @@ public class LabelsApp {
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();
-                logger.log(Level.WARNING, e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         });
     }
@@ -117,10 +112,11 @@ public class LabelsApp {
                         Translate.TranslateOption.targetLanguage("pt"));
                 labelsTranslated.add(translation.getTranslatedText());
             }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, e.getMessage());
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        } finally {
+            return labelsTranslated;
         }
-        return labelsTranslated;
     }
 
     private GenericRecord deserializeAvroSchema(ByteString data) throws IOException {
@@ -128,5 +124,19 @@ public class LabelsApp {
         DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
         Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataString);
         return reader.read(null, decoder);
+    }
+
+    public static void main(String[] args) {
+        LabelsApp app = new LabelsApp();
+        app.checkSub();
+        // Keep the application running to listen for messages
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
     }
 }

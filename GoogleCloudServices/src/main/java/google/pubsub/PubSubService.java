@@ -22,7 +22,6 @@ import com.google.pubsub.v1.PubsubMessage;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -127,4 +126,3 @@ public class PubSubService {
         }
     }
 }
-

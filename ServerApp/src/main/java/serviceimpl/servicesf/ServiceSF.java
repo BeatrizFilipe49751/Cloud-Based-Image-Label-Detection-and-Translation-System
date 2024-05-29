@@ -7,8 +7,6 @@ import google.firestore.models.ImageInformation;
 import google.pubsub.PubSubService;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import labels.LabelsApp;
-import logging.LoggingApp;
 import servicesf.*;
 
 import java.io.IOException;
@@ -17,23 +15,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
-    public ServiceSF(int port) {
-        LoggingApp loggingApp = new LoggingApp();
-        loggingApp.checkSub();
-        LabelsApp labelsApp = new LabelsApp();
-        labelsApp.checkSub();
-    }
+
+    private final CloudStorageService cs;
+    private final FirestoreService fs;
+    private final PubSubService pubSubService;
 
     private final Logger logger = Logger.getLogger(ServiceSF.class.getName());
 
-    private final CloudStorageService cs = new CloudStorageService();
-    private final FirestoreService fs = new FirestoreService();
-
-    private final PubSubService pubSubService = new PubSubService();
+    public ServiceSF(int port) {
+        this.cs = new CloudStorageService();
+        this.fs = new FirestoreService();
+        this.pubSubService = new PubSubService();
+    }
 
     @Override
     public StreamObserver<ImageSubmissionRequest> submitImage(StreamObserver<ImageSubmissionResponse> responseObserver) {

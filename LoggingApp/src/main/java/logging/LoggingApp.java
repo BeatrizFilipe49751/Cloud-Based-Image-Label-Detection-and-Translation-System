@@ -11,15 +11,11 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class LoggingApp {
-    private static final Logger logger = Logger.getLogger(LoggingApp.class.getName());
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
@@ -49,7 +45,7 @@ public class LoggingApp {
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();
-                logger.log(Level.WARNING, e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         });
     }
@@ -59,5 +55,19 @@ public class LoggingApp {
         DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
         Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataString);
         return reader.read(null, decoder);
+    }
+
+    public static void main(String[] args) {
+        LoggingApp app = new LoggingApp();
+        app.checkSub();
+        // Keep the application running to listen for messages
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
     }
 }

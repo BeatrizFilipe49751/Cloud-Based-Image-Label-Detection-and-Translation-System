@@ -24,15 +24,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import servicesf.*;
 import servicesg.*;
 
 public class ClientApp {
 
-    private final static Logger logger = Logger.getLogger(ClientApp.class.getName());
     static String cfURL="https://us-central1-cn2324-t1-g09.cloudfunctions.net/lookupFunction?zone=us-central1-c&prjid=cn2324-t1-g09&group=grpc-servers";
     private static int svcPort = 8000;
     private static ManagedChannel channel;
@@ -97,7 +94,7 @@ public class ClientApp {
                 System.out.println("######## MENU ##########");
                 System.out.println("Options for Google Storage Operations:");
                 System.out.println(" 0: Add or remove gRPC server instances");
-                System.out.println(" 1: Add or remove application server instances");
+                System.out.println(" 1: Add or remove Image Processing server instances");
                 System.out.println("..........");
                 System.out.println("3: Exit");
                 System.out.print("Enter an Option: ");
@@ -110,7 +107,7 @@ public class ClientApp {
     public static void main(String[] args) throws Exception {
         boolean end = false;
         CountDownLatch operationLatch = new CountDownLatch(1);
-        /*
+
         // Fetch IP addresses at the start
         List<String> ips = fetchIPAddresses();
         if (ips.isEmpty()) {
@@ -126,9 +123,7 @@ public class ClientApp {
         }
         System.out.print("Choose an IP by entering its number: ");
         int ipChoice = scan.nextInt();
-        String chosenIP = ips.get(ipChoice);*/
-        Scanner scan = new Scanner(System.in);
-        String chosenIP = "localhost";
+        String chosenIP = ips.get(ipChoice);
 
         channel = ManagedChannelBuilder.forAddress(chosenIP, svcPort).usePlaintext().build();
 
@@ -210,7 +205,7 @@ public class ClientApp {
                         end = true;
                 }
             } catch (Exception ex) {
-                logger.log(Level.SEVERE, "Error starting client app with exception: " + ex.getMessage());
+                System.out.println("Error executing operations!");
             }
         }
     }
