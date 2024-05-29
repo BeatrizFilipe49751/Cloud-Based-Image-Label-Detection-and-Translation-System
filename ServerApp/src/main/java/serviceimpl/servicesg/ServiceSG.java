@@ -1,8 +1,10 @@
 package serviceimpl.servicesg;
 
-import google.scaling.ScalingInstancesService;
+import google.scaling.service.ScalingInstancesService;
 import io.grpc.stub.StreamObserver;
 import servicesg.*;
+
+import java.io.IOException;
 
 /**
  * gRPC service implementation for scaling server instances and image processing instances.
@@ -16,7 +18,7 @@ public class ServiceSG extends ServiceSGGrpc.ServiceSGImplBase {
      *
      * @param port The port number for the service (not used in this implementation).
      */
-    public ServiceSG(int port) {
+    public ServiceSG(int port) throws IOException {
         this.si = new ScalingInstancesService();
     }
 

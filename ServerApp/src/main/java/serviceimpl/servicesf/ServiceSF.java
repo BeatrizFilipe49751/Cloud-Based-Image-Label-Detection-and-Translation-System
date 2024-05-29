@@ -4,7 +4,7 @@ import com.google.cloud.Timestamp;
 import google.cloudstorage.CloudStorageService;
 import google.firestore.FirestoreService;
 import google.firestore.models.ImageInformation;
-import google.pubsub.PubSubService;
+import google.pubsub.service.PubSubService;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import servicesf.*;
@@ -34,7 +34,7 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
      *
      * @param port The port number for the service.
      */
-    public ServiceSF(int port) {
+    public ServiceSF(int port) throws IOException {
         this.cs = new CloudStorageService();
         this.fs = new FirestoreService();
         this.pubSubService = new PubSubService();
