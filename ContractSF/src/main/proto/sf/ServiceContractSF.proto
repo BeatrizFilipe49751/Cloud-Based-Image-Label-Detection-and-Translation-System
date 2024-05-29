@@ -12,7 +12,7 @@ service ServiceSF{
   // Get details and translations of image
   rpc getImageDetails(ImageDetailsRequest) returns (ImageDetailsResponse);
 
-  // Get all files with certain dates and characteristic
+  // Get all files with certain dates and a characteristic
   rpc getAllFiles(AllFilesWithRequest) returns (stream AllFilesWithResponse);
 }
 
@@ -43,7 +43,3 @@ message AllFilesWithRequest{
 message AllFilesWithResponse{
   repeated string file_names = 1;
 }
-
-/*
-[OPTIONAL]
- */

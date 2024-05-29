@@ -4,11 +4,21 @@ import google.scaling.ScalingInstancesService;
 import io.grpc.stub.StreamObserver;
 import servicesg.*;
 
+/**
+ * gRPC service implementation for scaling server instances and image processing instances.
+ */
 public class ServiceSG extends ServiceSGGrpc.ServiceSGImplBase {
 
-    private final ScalingInstancesService si = new ScalingInstancesService();
+    private final ScalingInstancesService si;
 
-    public ServiceSG(int port) {}
+    /**
+     * Constructor to initialize the ScalingInstancesService.
+     *
+     * @param port The port number for the service (not used in this implementation).
+     */
+    public ServiceSG(int port) {
+        this.si = new ScalingInstancesService();
+    }
 
     @Override
     public void scaleServerInstances(ScaleServerInstancesRequest request, StreamObserver<ScaleServerInstancesResponse> responseObserver) {

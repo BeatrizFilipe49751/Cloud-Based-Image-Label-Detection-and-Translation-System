@@ -4,7 +4,7 @@ import com.google.cloud.Timestamp;
 import com.google.protobuf.ByteString;
 import google.firestore.FirestoreService;
 import google.firestore.models.LogEntry;
-import google.pubsub.PubSubService;
+import google.pubsub.service.PubSubService;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -15,11 +15,17 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Application to process log messages and save them to Firestore.
+ */
 public class LoggingApp {
     private final FirestoreService firestoreService;
     private final PubSubService pubSubService;
     private final Schema schema;
 
+    /**
+     * Constructor to initialize FirestoreService, PubSubService, and Avro schema.
+     */
     public LoggingApp() {
         try {
             this.firestoreService = new FirestoreService();
@@ -30,6 +36,9 @@ public class LoggingApp {
         }
     }
 
+    /**
+     * Method to subscribe to Pub/Sub messages and process them.
+     */
     public void checkSub() {
         pubSubService.subscribeMessageLogging((message, consumer) -> {
             ByteString data = message.getData();
@@ -45,11 +54,18 @@ public class LoggingApp {
                 consumer.ack();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 consumer.nack();
-                System.out.println("Error: " + e.getMessage());
+                System.err.println("Error: " + e.getMessage());
             }
         });
     }
 
+    /**
+     * Method to deserialize Avro schema from ByteString.
+     *
+     * @param data ByteString containing Avro data.
+     * @return Deserialized Avro record.
+     * @throws IOException if an error occurs during deserialization.
+     */
     private GenericRecord deserializeAvroSchema(ByteString data) throws IOException {
         String dataString = data.toStringUtf8();
         DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
@@ -57,6 +73,11 @@ public class LoggingApp {
         return reader.read(null, decoder);
     }
 
+    /**
+     * Main method to run the LoggingApp.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         LoggingApp app = new LoggingApp();
         app.checkSub();

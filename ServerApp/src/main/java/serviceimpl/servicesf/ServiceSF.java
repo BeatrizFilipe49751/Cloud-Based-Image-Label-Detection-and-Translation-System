@@ -15,7 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * gRPC service implementation for handling image submissions and image details retrieval.
+ */
 public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
     private final CloudStorageService cs;
@@ -24,6 +29,11 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
 
     private final Logger logger = Logger.getLogger(ServiceSF.class.getName());
 
+    /**
+     * Constructor to initialize required services.
+     *
+     * @param port The port number for the service.
+     */
     public ServiceSF(int port) {
         this.cs = new CloudStorageService();
         this.fs = new FirestoreService();
@@ -93,7 +103,6 @@ public class ServiceSF extends ServiceSFGrpc.ServiceSFImplBase {
             responseObserver.onCompleted();
 
         } catch (Exception e) {
-            // e.message
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }

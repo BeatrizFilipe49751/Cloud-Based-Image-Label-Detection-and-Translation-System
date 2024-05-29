@@ -10,8 +10,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Cloud Function that retrieves IP addresses of VM instances from a specified instance group in Google Cloud Platform.
+ */
 public class LookupFunction implements HttpFunction {
 
+    /**
+     * Handles HTTP requests and retrieves IP addresses of VM instances from a specified instance group.
+     *
+     * @param request  the HTTP request containing query parameters.
+     * @param response the HTTP response to write the result to.
+     * @throws Exception if any error occurs during processing.
+     */
     @Override
     public void service(HttpRequest request, HttpResponse response) throws Exception {
         String zone = request.getFirstQueryParameter("zone").orElse("");
@@ -34,6 +44,15 @@ public class LookupFunction implements HttpFunction {
         }
     }
 
+    /**
+     * Retrieves the IP addresses of VM instances in the specified instance group.
+     *
+     * @param zone    the zone of the instance group.
+     * @param project the project ID in Google Cloud Platform.
+     * @param group   the name of the instance group.
+     * @return a list of IP addresses of the VM instances.
+     * @throws IOException if any error occurs while fetching the IP addresses.
+     */
     private List<String> getInstanceGroupIps(String zone, String project, String group) throws IOException {
         List<String> ips = new ArrayList<>();
         System.out.println("==== Listing IPs of running VM from na instance group: " + group);

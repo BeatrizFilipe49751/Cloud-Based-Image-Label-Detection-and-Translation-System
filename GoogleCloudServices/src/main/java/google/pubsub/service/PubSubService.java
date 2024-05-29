@@ -1,6 +1,4 @@
-package google.pubsub;
-
-// PubSubService.java
+package google.pubsub.service;
 
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutureCallback;
@@ -19,32 +17,54 @@ import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
+import google.pubsub.config.PubSubConfig;
+import google.pubsub.util.AvroSchemaUtil;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * PubSubService is responsible for publishing and subscribing messages
+ * to and from Google Cloud Pub/Sub.
+ */
 public class PubSubService {
     private static final Logger logger = Logger.getLogger(PubSubService.class.getName());
-    private final String projectId = "CN2324-T1-G09";
-    private final String topicId = "GRPCServerMessages";
-    private final String loggingAppSubscriptionID = "LoggingAppSub";
-    private final String labelsAppSubscriptionID = "LabelsAppSub";
-    private final ExecutorProvider executorProvider = InstantiatingExecutorProvider.newBuilder().setExecutorThreadCount(4).build();
-    private Schema schema;
+    private final String projectId;
+    private final String topicId;
+    private final String loggingAppSubscriptionID;
+    private final String labelsAppSubscriptionID;
+    private final ExecutorProvider executorProvider;
+    private final AvroSchemaUtil avroSchemaUtil;
 
-    public PubSubService() {
-        try {
-            // Create Avro schema
-            this.schema = new Schema.Parser().parse(getClass().getResourceAsStream("/google/pubsub/messageSchema.avsc"));
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error reading Avro schema: " + e.getMessage());
-        }
+    /**
+     * Constructs a new PubSubService, initializing configuration and schema.
+     *
+     * @throws IOException if there is an error loading the configuration or schema
+     */
+    public PubSubService() throws IOException {
+        PubSubConfig config = new PubSubConfig();
+        this.avroSchemaUtil = new AvroSchemaUtil();
+        this.projectId = config.getProjectId();
+        this.topicId = config.getTopicId();
+        this.loggingAppSubscriptionID = config.getLoggingAppSubscriptionID();
+        this.labelsAppSubscriptionID = config.getLabelsAppSubscriptionID();
+        this.executorProvider = config.getExecutorProvider();
     }
 
+    /**
+     * Publishes a message to a Pub/Sub topic.
+     *
+     * @param id the ID of the message
+     * @param bucketName the name of the bucket
+     * @param blobName the name of the blob
+     * @throws IOException if there is an error during publishing
+     * @throws InterruptedException if the thread is interrupted during shutdown
+     */
     public void publishMessage(String id, String bucketName, String blobName) throws IOException, InterruptedException {
         ProjectTopicName topicName = ProjectTopicName.of(projectId, topicId);
         Publisher publisher = null;
@@ -52,13 +72,7 @@ public class PubSubService {
         try {
             publisher = Publisher.newBuilder(topicName).build();
 
-            // Create Avro record
-            GenericRecord record = new GenericData.Record(schema);
-            record.put("id", id);
-            record.put("bucketName", bucketName);
-            record.put("blobName", blobName);
-
-            ByteString data = ByteString.copyFromUtf8(record.toString());
+            ByteString data = avroSchemaUtil.createNewAvroRecord(id, bucketName, blobName);
 
             Timestamp timestamp = Timestamp.now();
 
@@ -93,16 +107,32 @@ public class PubSubService {
         }
     }
 
+    /**
+     * Subscribes to the logging application Pub/Sub subscription.
+     *
+     * @param receiver the message receiver
+     */
     public void subscribeMessageLogging(MessageReceiver receiver) {
         ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, loggingAppSubscriptionID);
         subscribeMessage(subscriptionName, receiver);
     }
 
+    /**
+     * Subscribes to the labels application Pub/Sub subscription.
+     *
+     * @param receiver the message receiver
+     */
     public void subscribeMessageLabels(MessageReceiver receiver) {
         ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, labelsAppSubscriptionID);
         subscribeMessage(subscriptionName, receiver);
     }
 
+    /**
+     * Subscribes to a Pub/Sub subscription with the given name and message receiver.
+     *
+     * @param subName the subscription name
+     * @param receiver the message receiver
+     */
     private void subscribeMessage(ProjectSubscriptionName subName, MessageReceiver receiver) {
         Subscriber subscriber = null;
 
